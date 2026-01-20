@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:6.0
+    container_name: edueval-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: edueval
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - edueval-network
+
+  # Backend Service
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: edueval-server
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 5000
+      MONGODB_URI: mongodb://admin:admin123@mongodb:27017/edueval?authSource=admin
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    depends_on:
+      - mongodb
+    networks:
+      - edueval-network
+
+  # Frontend Service
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: edueval-client
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: http://localhost:5000/api
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+      - /app/.next
+    depends_on:
+      - server
+    networks:
+      - edueval-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  edueval-network:
+    driver: bridge
