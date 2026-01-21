@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import api, { setAccessToken } from '../../lib/api';
+import Logo from '../../components/Logo';
 
 export default function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -55,11 +56,16 @@ export default function Login() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-      <div className="max-w-md w-full bg-white border rounded-lg p-8">
-        <h1 className="text-2xl font-bold text-center mb-2">Login</h1>
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-6">
+      <div className="max-w-md w-full bg-white shadow-xl rounded-2xl p-8">
+        {/* Logo */}
+        <div className="flex justify-center mb-6">
+          <Logo size="xl" showText={true} />
+        </div>
+        
+        <h1 className="text-2xl font-bold text-center mb-2">Welcome Back</h1>
         <p className="text-center text-gray-600 text-sm mb-6">
-          Use test credentials to access the system
+          Sign in to access your account
         </p>
 
         {errorMessage && (

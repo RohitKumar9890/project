@@ -1,0 +1,26 @@
+{
+  "name": "EduEval - Educational Evaluation System",
+  "short_name": "EduEval",
+  "description": "A comprehensive platform for educational evaluation, exam management, and student progress tracking",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3B82F6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["education", "productivity"],
+  "screenshots": []
+}
