@@ -4,11 +4,13 @@
 
 Your Render deployment had **3 critical issues** that are now resolved:
 
-### 1. ❌ Firebase Connection Error
-**Problem:** Firebase initialization failed due to missing/incorrect environment variables
+### 1. ❌ Firebase Connection Error / File Not Found
+**Problem:** Firebase initialization failed with "no such file or directory firebase-service-account.json"
 
 **Solution:** 
-- Improved `server/src/config/firebase.js` to prioritize environment variables
+- Fixed `server/src/config/firebase.js` to check environment variables FIRST
+- Never tries to read file when env vars are set (fixes Render file errors)
+- Added `existsSync()` check before reading file
 - Made `FIREBASE_DATABASE_URL` optional (not required for Firestore-only apps)
 - Added better error messages and logging
 

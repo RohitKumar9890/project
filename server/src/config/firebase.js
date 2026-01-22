@@ -1,5 +1,5 @@
 import admin from 'firebase-admin';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -19,11 +19,13 @@ export const initializeFirebase = () => {
     let credential;
     let useEnvVars = false;
     
-    // First, try environment variables (for production/Render)
-    if (process.env.FIREBASE_PROJECT_ID && 
-        process.env.FIREBASE_CLIENT_EMAIL && 
-        process.env.FIREBASE_PRIVATE_KEY) {
-      
+    // Check if we have environment variables (for production/Render)
+    const hasEnvVars = process.env.FIREBASE_PROJECT_ID && 
+                       process.env.FIREBASE_CLIENT_EMAIL && 
+                       process.env.FIREBASE_PRIVATE_KEY;
+    
+    if (hasEnvVars) {
+      // Use environment variables (PRODUCTION MODE)
       // eslint-disable-next-line no-console
       console.log('📝 Using Firebase credentials from environment variables');
       
@@ -51,17 +53,36 @@ export const initializeFirebase = () => {
       const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH || 
                                   join(__dirname, '../../firebase-service-account.json');
       
+      // eslint-disable-next-line no-console
+      console.log('📝 Attempting to load Firebase credentials from file:', serviceAccountPath);
+      
+      // Check if file exists before trying to read
+      if (!existsSync(serviceAccountPath)) {
+        throw new Error(
+          '❌ Firebase credentials not found!\n\n' +
+          'You must provide credentials via ONE of these methods:\n\n' +
+          '1. ENVIRONMENT VARIABLES (for Production/Render):\n' +
+          '   - FIREBASE_PROJECT_ID\n' +
+          '   - FIREBASE_CLIENT_EMAIL\n' +
+          '   - FIREBASE_PRIVATE_KEY\n\n' +
+          '2. SERVICE ACCOUNT FILE (for Local Development):\n' +
+          '   - Place firebase-service-account.json in server/ directory\n' +
+          '   - Or set FIREBASE_SERVICE_ACCOUNT_PATH env variable\n\n' +
+          `Current status:\n` +
+          `  - Environment variables set: NO\n` +
+          `  - Service account file exists: NO (checked: ${serviceAccountPath})\n\n` +
+          'For Render deployment, set the environment variables in Render Dashboard.\n' +
+          'Run "npm run render-helper" locally to get the values to set.'
+        );
+      }
+      
       try {
-        // eslint-disable-next-line no-console
-        console.log('📝 Attempting to load Firebase credentials from file:', serviceAccountPath);
         const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf8'));
         credential = admin.credential.cert(serviceAccount);
       } catch (fileError) {
         throw new Error(
-          'Firebase credentials not found. Please provide either:\n' +
-          '1. Environment variables: FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY\n' +
-          '2. File: firebase-service-account.json in server directory\n' +
-          `\nFile error: ${fileError.message}`
+          `Failed to load Firebase service account file: ${fileError.message}\n` +
+          'Make sure the file is valid JSON and not corrupted.'
         );
       }
     }
@@ -92,8 +113,13 @@ export const initializeFirebase = () => {
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('❌ Failed to initialize Firebase:', error.message);
-    // eslint-disable-next-line no-console
-    console.error('Stack trace:', error.stack);
+    
+    // Only show stack trace if it's not our custom error message
+    if (!error.message.includes('Firebase credentials not found')) {
+      // eslint-disable-next-line no-console
+      console.error('Stack trace:', error.stack);
+    }
+    
     throw error;
   }
 };
