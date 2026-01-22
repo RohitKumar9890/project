@@ -24,6 +24,7 @@
     "seed:test": "npm run seed:test --prefix server",
     "check-setup": "node scripts/check-setup.js",
     "generate-secrets": "node scripts/generate-jwt-secrets.js",
+    "render-helper": "node scripts/render-deploy-helper.js",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "docker:logs": "docker-compose logs -f"

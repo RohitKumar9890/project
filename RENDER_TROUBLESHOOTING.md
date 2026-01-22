@@ -149,17 +149,24 @@ npm start
 
 ---
 
-### Error 6: "Cannot read properties of undefined (reading 'replace')"
+### Error 6: "Cannot read properties of undefined (reading 'replace')" or "Firebase credentials not found"
 
-**Cause:** `FIREBASE_PRIVATE_KEY` is not set or malformed
+**Cause:** `FIREBASE_PRIVATE_KEY` is not set or malformed, or missing Firebase environment variables
 
 **Solution:**
-1. The private key must be in quotes in Render dashboard
-2. Keep the newlines as `\n` (literal backslash-n)
-3. Example format:
+1. **UPDATED FIX:** The Firebase configuration now prioritizes environment variables and provides better error messages
+2. Ensure ALL THREE variables are set:
+   - `FIREBASE_PROJECT_ID`
+   - `FIREBASE_CLIENT_EMAIL`
+   - `FIREBASE_PRIVATE_KEY`
+3. The private key must include BEGIN/END markers
+4. Keep the newlines as `\n` (literal backslash-n)
+5. Example format:
 ```
------BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0...\n-----END PRIVATE KEY-----\n
+"-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0...\n-----END PRIVATE KEY-----\n"
 ```
+
+**Note:** Latest code now makes `FIREBASE_DATABASE_URL` optional (not required for Firestore-only apps)
 
 ---
 

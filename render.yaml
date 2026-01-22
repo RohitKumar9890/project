@@ -9,7 +9,7 @@ services:
     plan: free
     # Fixed build command - install dependencies in server directory
     buildCommand: npm install --prefix server --production
-    startCommand: cd server && npm start
+    startCommand: npm start --prefix server
     healthCheckPath: /api/health
     envVars:
       # Core Configuration
