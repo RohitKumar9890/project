@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { body } from 'express-validator';
-import { register, login, refresh, me, requestPasswordReset, resetPassword } from '../controllers/authController.js';
+import { register, login, refresh, me, requestPasswordReset, resetPassword, oauthLogin } from '../controllers/authController.js';
 import { requireAuth } from '../middleware/authMiddleware.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { authLimiter } from '../middleware/rateLimitMiddleware.js';
@@ -46,6 +46,17 @@ router.post(
     body('newPassword').isString().isLength({ min: 6 }),
   ],
   asyncHandler(resetPassword)
+);
+
+// OAuth login route (Google/Microsoft)
+router.post(
+  '/oauth/login',
+  authLimiter,
+  [
+    body('idToken').isString().isLength({ min: 10 }),
+    body('provider').optional().isString().isIn(['google.com', 'microsoft.com', 'google', 'microsoft']),
+  ],
+  asyncHandler(oauthLogin)
 );
 
 export default router;

@@ -20,6 +20,10 @@ export class User {
       passwordHash: userData.passwordHash || null,
       role: userData.role,
       isActive: userData.isActive !== undefined ? userData.isActive : true,
+      // OAuth fields
+      firebaseUid: userData.firebaseUid || null,
+      oauthProvider: userData.oauthProvider || null,
+      photoURL: userData.photoURL || null,
       // Password reset fields
       resetPasswordToken: userData.resetPasswordToken || null,
       resetPasswordExpires: userData.resetPasswordExpires || null,

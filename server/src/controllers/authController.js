@@ -4,6 +4,7 @@ import { hashPassword, verifyPassword } from '../utils/password.js';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/jwt.js';
 import crypto from 'crypto';
 import { sendEmail } from '../utils/emailService.js';
+import admin from 'firebase-admin';
 
 const toAuthResponse = (user) => {
   const payload = { sub: user._id.toString(), role: user.role };
@@ -165,4 +166,102 @@ export const resetPassword = async (req, res) => {
   });
 
   return res.json({ message: 'Password reset successfully. You can now login with your new password.' });
+};
+
+/**
+ * OAuth Login (Google/Microsoft via Firebase Authentication)
+ * Verifies Firebase ID token and creates/logs in user
+ */
+export const oauthLogin = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { idToken, provider } = req.body;
+
+  try {
+    // Verify Firebase ID token
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    
+    const { email, name, picture, uid, firebase } = decodedToken;
+    
+    if (!email) {
+      return res.status(400).json({ 
+        message: 'Email not provided by OAuth provider. Please use an account with email access.' 
+      });
+    }
+
+    // Check if user exists
+    let user = await User.findOne({ email: email.toLowerCase() });
+
+    if (user) {
+      // Existing user - check if active
+      if (!user.isActive) {
+        return res.status(401).json({ 
+          message: 'Account is deactivated. Please contact administrator.' 
+        });
+      }
+
+      // Update OAuth info if needed
+      const updates = {};
+      if (picture && !user.photoURL) {
+        updates.photoURL = picture;
+      }
+      if (uid && !user.firebaseUid) {
+        updates.firebaseUid = uid;
+      }
+      if (provider && !user.oauthProvider) {
+        updates.oauthProvider = provider;
+      }
+
+      if (Object.keys(updates).length > 0) {
+        await User.updateById(user._id, updates);
+        user = await User.findById(user._id);
+      }
+    } else {
+      // New user - auto-create with student role
+      // Extract provider from Firebase sign-in method
+      const signInProvider = firebase?.sign_in_provider || provider || 'oauth';
+      
+      user = await User.create({
+        name: name || email.split('@')[0], // Use email prefix if no name
+        email: email.toLowerCase(),
+        role: USER_ROLES.STUDENT, // Default to student for OAuth
+        passwordHash: null, // OAuth users don't have password
+        firebaseUid: uid,
+        oauthProvider: signInProvider,
+        photoURL: picture || null,
+        isActive: true,
+      });
+
+      // Send welcome email
+      sendEmail(user.email, 'welcomeEmail', {
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        loginUrl: `${process.env.CLIENT_URL || 'http://localhost:3000'}/auth/login`,
+        isOAuth: true,
+        provider: signInProvider,
+      }).catch(err => console.error('Welcome email error:', err));
+    }
+
+    // Return tokens
+    return res.json(toAuthResponse(user));
+    
+  } catch (error) {
+    console.error('OAuth login error:', error);
+    
+    if (error.code === 'auth/id-token-expired') {
+      return res.status(401).json({ message: 'Authentication token expired. Please try again.' });
+    }
+    
+    if (error.code === 'auth/invalid-id-token' || error.code === 'auth/argument-error') {
+      return res.status(401).json({ message: 'Invalid authentication token.' });
+    }
+
+    return res.status(500).json({ 
+      message: 'OAuth authentication failed. Please try again.' 
+    });
+  }
 };
