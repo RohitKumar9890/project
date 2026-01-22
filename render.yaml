@@ -7,21 +7,54 @@ services:
     runtime: node
     region: oregon
     plan: free
-    buildCommand: cd server && npm install
+    # Fixed build command - install dependencies in server directory
+    buildCommand: npm install --prefix server --production
     startCommand: cd server && npm start
     healthCheckPath: /api/health
     envVars:
+      # Core Configuration
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 5000
+      
+      # JWT Configuration (REQUIRED - Set these in Render Dashboard)
       - key: JWT_SECRET
-        generateValue: true
-      - key: JWT_ACCESS_EXPIRES_IN
-        value: 15m
-      - key: JWT_REFRESH_EXPIRES_IN
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: JWT_EXPIRE
         value: 7d
-      - key: SESSION_SECRET
-        generateValue: true
-      - key: MICROSOFT_TENANT
-        value: common
+      - key: JWT_REFRESH_EXPIRE
+        value: 30d
+      
+      # Firebase Configuration (REQUIRED - Set these in Render Dashboard)
+      # You must add these manually in the Render dashboard
+      - key: FIREBASE_PROJECT_ID
+        sync: false
+      - key: FIREBASE_CLIENT_EMAIL
+        sync: false
+      - key: FIREBASE_PRIVATE_KEY
+        sync: false
+      - key: FIREBASE_DATABASE_URL
+        sync: false
+      
+      # CORS Configuration (Update after getting Vercel URL)
+      - key: CORS_ORIGIN
+        value: https://your-app.vercel.app
+      - key: CLIENT_URL
+        value: https://your-app.vercel.app
+      
+      # Optional: Email Configuration
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: 587
+      - key: EMAIL_FROM
+        value: noreply@edueval.com
+      
+      # Optional: Code Execution
+      - key: CODE_EXECUTION_TIMEOUT
+        value: 10000
+      - key: CODE_EXECUTION_MEMORY_LIMIT
+        value: 256
