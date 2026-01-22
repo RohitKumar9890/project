@@ -154,6 +154,13 @@ export default function FacultyExams() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm space-x-2">
                   <Button
+                    variant="primary"
+                    onClick={() => router.push(`/faculty/exams/${exam.id}`)}
+                    className="text-xs"
+                  >
+                    Edit/View
+                  </Button>
+                  <Button
                     variant="secondary"
                     onClick={() => handlePublishExam(exam.id, exam.isPublished)}
                     className="text-xs"

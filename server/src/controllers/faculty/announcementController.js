@@ -82,11 +82,13 @@ export const createAnnouncement = asyncHandler(async (req, res) => {
 });
 
 export const deleteAnnouncement = asyncHandler(async (req, res) => {
-  const announcement = await Announcement.findOne({
-    _id: req.params.id,
-    postedBy: req.user.id,
-  });
+  const announcement = await Announcement.findById(req.params.id);
   if (!announcement) return res.status(404).json({ message: 'Announcement not found' });
+  
+  // Verify ownership
+  if (announcement.createdBy !== req.user.id) {
+    return res.status(403).json({ message: 'Access denied' });
+  }
   
   await Announcement.deleteById(req.params.id);
   res.json({ success: true });

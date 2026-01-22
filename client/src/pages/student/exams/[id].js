@@ -58,6 +58,18 @@ export default function TakeExam() {
       const examRes = await api.get(`/student/exams/${id}`);
       setExam(examRes.data.exam);
 
+      // Check if already submitted
+      try {
+        const submissionRes = await api.get(`/student/exams/${id}/submission`);
+        if (submissionRes.data.submission && submissionRes.data.submission.status === 'submitted') {
+          toast.info('You have already submitted this exam. Redirecting to progress page...');
+          setTimeout(() => router.push('/student/progress'), 2000);
+          return;
+        }
+      } catch (e) {
+        // No existing submission, continue
+      }
+
       // Start attempt
       const attemptRes = await api.post(`/student/exams/${id}/start`);
       setSubmission(attemptRes.data.submission);
