@@ -1,5 +1,13 @@
 import axios from 'axios';
 
+// Debug: Log the API URL to console
+if (typeof window !== 'undefined') {
+  console.log('🔍 API Configuration:', {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    baseURL: process.env.NEXT_PUBLIC_API_URL + '/api',
+  });
+}
+
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL + '/api',
   timeout: 10000, // 10 second timeout
