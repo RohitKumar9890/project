@@ -135,17 +135,6 @@ export default function Login() {
           </div>
         )}
 
-        {/* Test Accounts Info */}
-        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded text-sm">
-          <p className="font-semibold text-blue-900 mb-2">📋 Test Accounts:</p>
-          <ul className="text-blue-800 space-y-1 text-xs">
-            <li><strong>Admin:</strong> rk8766323@gmail.com</li>
-            <li><strong>Faculty:</strong> faculty@test.com</li>
-            <li><strong>Student:</strong> student@test.com</li>
-          </ul>
-          <p className="text-blue-600 mt-2 text-xs">See TEST_ACCOUNTS.md for passwords</p>
-        </div>
-
         {/* OAuth Buttons */}
         <div className="space-y-3 mb-6">
           <button
