@@ -9,6 +9,8 @@ import {
   unpublishExam,
   deleteExam,
 } from '../../controllers/faculty/examController.js';
+import { cloneExam } from '../../controllers/faculty/examTemplateController.js';
+import { asyncHandler } from '../../utils/asyncHandler.js';
 
 const router = Router();
 
@@ -33,6 +35,20 @@ router.patch(
   '/:id',
   [param('id').isString()],
   updateExam
+);
+
+// Clone exam
+router.post(
+  '/:id/clone',
+  [
+    param('id').isString().isLength({ min: 12 }),
+    body('title').optional().isString().isLength({ min: 3, max: 200 }),
+    body('durationMinutes').optional().isInt({ min: 1, max: 480 }),
+    body('totalMarks').optional().isInt({ min: 1 }),
+    body('startsAt').optional().isISO8601().toDate(),
+    body('endsAt').optional().isISO8601().toDate(),
+  ],
+  asyncHandler(cloneExam)
 );
 
 router.post('/:id/publish', [param('id').isString().isLength({ min: 12 })], publishExam);

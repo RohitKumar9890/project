@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import examRoutes from './examRoutes.js';
+import performanceRoutes from './performanceRoutes.js';
 import { getMyProgress } from '../../controllers/student/progressController.js';
 import { joinExamByCode, getMyEnrolledExams } from '../../controllers/student/enrollmentController.js';
 import { getMyMaterials, getSubjectById } from '../../controllers/student/materialController.js';
@@ -14,5 +15,6 @@ router.get('/materials', getMyMaterials);
 router.get('/subjects/:id', getSubjectById);
 router.get('/announcements', getMyAnnouncements);
 router.use('/exams', examRoutes);
+router.use('/performance', performanceRoutes);
 
 export default router;

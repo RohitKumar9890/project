@@ -3,6 +3,7 @@ import semesterRoutes from './semesterRoutes.js';
 import subjectRoutes from './subjectRoutes.js';
 import userRoutes from './userRoutes.js';
 import sectionRoutes from './sectionRoutes.js';
+import auditLogRoutes from './auditLogRoutes.js';
 import { exportUsersToExcel, exportExamResults, exportAllSubmissions, downloadUserTemplate } from '../../controllers/admin/exportController.js';
 import { bulkImportUsers } from '../../controllers/admin/importController.js';
 import { upload } from '../../config/multer.js';
@@ -13,6 +14,7 @@ router.use('/semesters', semesterRoutes);
 router.use('/subjects', subjectRoutes);
 router.use('/users', userRoutes);
 router.use('/sections', sectionRoutes);
+router.use('/audit-logs', auditLogRoutes);
 
 // Excel export routes
 router.get('/export/users', exportUsersToExcel);

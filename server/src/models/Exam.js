@@ -10,13 +10,14 @@ const COLLECTION_NAME = 'exams';
 
 export class Exam {
   static generateExamCode() {
-    // Generate a unique 6-character exam code
+    // Generate a unique 12-character exam code (stronger security)
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Removed confusing chars
     let code = '';
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 12; i++) {
       code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    return code;
+    // Format as XXXX-XXXX-XXXX for readability
+    return `${code.slice(0, 4)}-${code.slice(4, 8)}-${code.slice(8, 12)}`;
   }
 
   static async create(examData) {
