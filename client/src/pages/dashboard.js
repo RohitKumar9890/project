@@ -75,7 +75,7 @@ export default function Dashboard() {
   }
 
   if (me.role === 'student') {
-    router.push('/student/dashboard');
+    router.push('/student/exams');
     return (
       <Layout>
         <Card title="Dashboard">
